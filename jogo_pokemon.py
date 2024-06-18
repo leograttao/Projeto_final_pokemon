@@ -82,9 +82,6 @@ def restaurar_vida_lista(lista_pokemons):
     for pokemon in lista_pokemons:
         restaurar_vida(pokemon)
 
-def sorteio_pokemon(lista_pokemon): 
-    return random.choice(lista_pokemon)
-
 def introducao():
     global nome_jogador
     nome_jogador = simpledialog.askstring("Introdução", "Olá, sou o professor Carvalho, um pesquisador Pokémon. Qual é o seu nome?")
@@ -94,22 +91,19 @@ def introducao():
 
 def menu_principal():
     menu_frame.pack(fill="both", expand=True)
-    label_bem_vindo.config(text=f"Bem-vindo, {nome_jogador}!")
+    label_bem_vindo.config(text=f"Bem-vindo {nome_jogador}, sua jornada pokémon se inicia aqui!!")
     
 def listar_pokedex():
     top = Toplevel()
     top.title("Pokédex")
     for idx, pokemon in enumerate(pokedex):
         caminho_imagem = os.path.join(pasta_imagens, pokemon[4])
-        try:
-            img = Image.open(caminho_imagem)
-            img = img.resize((100, 100))
-            photo = ImageTk.PhotoImage(img)
-            label = Label(top, text=f"{pokemon[0]}\nVida: {pokemon[1]}\nDano: {pokemon[2]}", image=photo, compound="top")
-            label.image = photo
-            label.grid(row=idx // 3, column=idx % 3, padx=10, pady=10)
-        except FileNotFoundError:
-            messagebox.showerror("Erro", f"Arquivo não encontrado: {caminho_imagem}")
+        img = Image.open(caminho_imagem)
+        img = img.resize((100, 100))
+        photo = ImageTk.PhotoImage(img)
+        label = Label(top, text=f"{pokemon[0]}\nVida: {pokemon[1]}\nDano: {pokemon[2]}", image=photo, compound="top")
+        label.image = photo
+        label.grid(row=idx // 3, column=idx % 3, padx=10, pady=10)
 
 def ver_insignias():
     top = Toplevel()
@@ -117,35 +111,13 @@ def ver_insignias():
     
     for idx, insignia in enumerate(insignias):
         caminho_imagem = os.path.join(pasta_imagens, f"{insignia}.png")
-        
-        try:
-            img = Image.open(caminho_imagem)
-            img = img.resize((100, 100)) 
-            photo = ImageTk.PhotoImage(img)
-            
-            label = Label(top, text=insignia, image=photo, compound="top")
-            label.image = photo
-            label.grid(row=idx // 3, column=idx % 3, padx=10, pady=10)
-        except FileNotFoundError:
-            messagebox.showerror("Erro", f"Arquivo não encontrado: {caminho_imagem}")
-
-def escolher_pokemon(pokemons, ginasio, rodada=0):
-    top = Toplevel()
-    top.title("Escolha seu Pokémon")
-
-    def escolher(idx):
-        pokemon_escolhido = pokedex[idx]
-        top.destroy()
-        iniciar_batalha(pokemon_escolhido, pokemons, ginasio, rodada)
-    
-    for idx, pokemon in enumerate(pokedex):
-        caminho_imagem = os.path.join(pasta_imagens, pokemon[4])
         img = Image.open(caminho_imagem)
-        img = img.resize((100, 100))
+        img = img.resize((100, 100)) 
         photo = ImageTk.PhotoImage(img)
-        btn = ttk.Button(top, text=f"{pokemon[0]}\nVida: {pokemon[1]}\nDano: {pokemon[2]}", image=photo, compound="top", command=lambda idx=idx: escolher(idx))
-        btn.image = photo
-        btn.grid(row=idx // 3, column=idx % 3, padx=10, pady=10)
+            
+        label = Label(top, text=insignia, image=photo, compound="top")
+        label.image = photo
+        label.grid(row=idx // 3, column=idx % 3, padx=10, pady=10)
 
 def iniciar_batalha(pokemon_escolhido, pokemons, ginasio, rodada):
     if rodada == 0:
@@ -178,30 +150,28 @@ def iniciar_batalha(pokemon_escolhido, pokemons, ginasio, rodada):
                 verificar_fim_de_jogo()
                 return
 
+def escolher_pokemon(pokemons, ginasio, rodada=0):
+    top = Toplevel()
+    top.title("Escolha seu Pokémon")
+
+    def escolher(pokemonn):
+        pokemon_escolhido = pokedex[pokemonn]
+        top.destroy()
+        iniciar_batalha(pokemon_escolhido, pokemons, ginasio, rodada)
+    
+    for pokemonn, pokemon in enumerate(pokedex):
+        caminho_imagem = os.path.join(pasta_imagens, pokemon[4])
+        img = Image.open(caminho_imagem)
+        img = img.resize((100, 100))
+        photo = ImageTk.PhotoImage(img)
+        btn = ttk.Button(top, text=f"{pokemon[0]}\nVida: {pokemon[1]}\nDano: {pokemon[2]}", image=photo, compound="top", command=lambda idx=pokemonn: escolher(idx))
+        btn.image = photo
+        btn.grid(row=pokemonn // 3, column=pokemonn % 3, padx=10, pady=10)
+
 def verificar_fim_de_jogo():
     if len(insignias) == 3:
-        mostrar_imagem_campeao()
-
-def mostrar_imagem_campeao():
-    top = Toplevel()
-    top.title("Campeão Pokémon")
-    
-    caminho_imagem_campeao = os.path.join(pasta_imagens, "champion.png")
-    
-    try:
-        img = Image.open(caminho_imagem_campeao)
-        img = img.resize((1920, 1080)) 
-        photo = ImageTk.PhotoImage(img)
-        
-        label = Label(top, image=photo)
-        label.image = photo
-        label.pack(pady=20)
-        
-        label_texto = Label(top, text="Parabéns! Você coletou todas as insígnias e se tornou um campeão Pokémon!", font=("Helvetica", 16))
-        label_texto.pack(pady=20)
-        
-    except FileNotFoundError:
-        messagebox.showerror("Erro", f"Arquivo não encontrado: {caminho_imagem_campeao}")
+        messagebox.showinfo("Fim de Jogo", "Parabéns! Você coletou todas as insígnias e se tornou um campeão Pokémon!")
+        root.destroy()
 
 def salvar_jogo():
     if not os.path.exists("pok_insig_data"):
